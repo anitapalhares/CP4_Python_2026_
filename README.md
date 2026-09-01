@@ -9,10 +9,6 @@
 
 > Ferramenta web para conversão, visualização e manipulação de dados em diferentes formatos.
 
-## Repositorio
-
-https://github.com/anitapalhares/CP4_Python_2026_
-
 ---
 
 ## Sobre
