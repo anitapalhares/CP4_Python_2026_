@@ -9,13 +9,17 @@
 
 > Ferramenta web para conversão, visualização e manipulação de dados em diferentes formatos.
 
+## Repositorio
+
+https://github.com/anitapalhares/CP4_Python_2026_
+
 ---
 
 ## Sobre
 
 O **Data App** é uma ferramenta desenvolvida em Python que permite realizar a conversão de dados entre diferentes formatos de arquivos.
 
-A aplicação utiliza **Pandas** para manipulação dos dados e **Streamlit** para criar uma interface web simples, intuitiva e visualmente agradável.
+A aplicação utiliza **Pandas** para manipulação dos dados e **Streamlit** para criar uma interface web simples, intuitiva e visualmente agradável, com identidade visual própria inspirada no estilo **DEV.AK**.
 
 O projeto foi desenvolvido para o **Checkpoint 4 — Computational Thinking With Python**, com foco na manipulação de dados, arquivos, conversões e tratamento de erros.
 
@@ -23,14 +27,29 @@ O projeto foi desenvolvido para o **Checkpoint 4 — Computational Thinking With
 
 ## Funcionalidades
 
-- Conversão de um dict Python para JSON
-- Conversão de um dict Python para CSV
-- Conversão de arquivos JSON para CSV (e vice-versa)
-- Conversão de arquivos XLSX para CSV (e vice-versa)
-- Visualização dos dados carregados em formato de tabela
-- Exibição de métricas (número de linhas e colunas)
-- Download do arquivo já convertido
-- Tratamento de erros e exceções durante leitura e conversão
+- Entrada de dados por texto: digitação direta de um **dict** ou **lista/array Python** em uma caixa de texto, sem necessidade de enviar arquivo
+- Upload de arquivo **.py** contendo um dict ou lista Python, que é interpretado automaticamente
+- Upload de arquivos nos formatos **CSV**, **JSON** e **XLSX**
+- Reconhecimento automático de dados aninhados em uma chave `"data"` (ex.: `{"data": [...]}`), tanto em JSON quanto em dict/texto
+- Conversão de saída para **JSON**, **CSV** ou **XLSX**, a partir de qualquer um dos formatos de entrada suportados (conversão N para N, não apenas pares fixos)
+- Visualização dos dados carregados em formato de tabela (prévia)
+- Prévia do conteúdo convertido antes do download (JSON e CSV)
+- Download do arquivo já convertido, com o tipo MIME correto para cada formato
+- Manutenção dos dados carregados entre interações através de `st.session_state`
+- Tratamento de erros e exceções durante leitura e conversão, exibindo a mensagem do erro e o tipo da exceção
+
+---
+
+## Interface Visual
+
+A aplicação possui um layout customizado, com estilo próprio inspirado na identidade **DEV.AK**:
+
+- Fundo branco com um gradiente roxo suave no canto superior esquerdo
+- Paleta de cores baseada em tons de roxo (`#9b8cff` e `#6c5ce7`) e preto (`#111111`)
+- Tipografia com títulos em negrito e espaçamento reduzido entre letras
+- Campos de texto, área de upload, botões e seletor de formato estilizados com bordas arredondadas e destaque roxo ao interagir
+- Botões com efeito de elevação (sombra e leve deslocamento) ao passar o mouse
+- Rodapé padrão do Streamlit ocultado para um visual mais limpo
 
 ---
 
@@ -91,6 +110,30 @@ streamlit run app.py
 
 ---
 
+## Como Utilizar
+
+1. Digite um dict ou lista Python na caixa de texto **ou** envie um arquivo nos formatos CSV, JSON, XLSX ou PY
+2. Clique em **Enviar**
+3. Os dados carregados serão exibidos em uma tabela de prévia
+4. Selecione o formato de saída desejado (JSON, CSV ou XLSX)
+5. Confira a prévia do conteúdo convertido (quando aplicável) e clique em **Baixar**
+6. Caso algum erro ocorra durante o processo, uma mensagem com a descrição e o tipo do erro será exibida na tela
+
+---
+
+## Tratamento de Erros
+
+A aplicação foi desenvolvida prevendo cenários como:
+
+- Texto digitado que não representa um dict ou lista Python válida
+- Arquivos em formatos não suportados ou corrompidos
+- Ausência de texto ou arquivo enviado no momento do envio
+- Falhas durante o processo de leitura ou conversão dos dados
+
+Em todos esses casos, o erro é capturado e exibido de forma clara para o usuário, junto com o tipo da exceção ocorrida, sem interromper a execução da aplicação.
+
+---
+
 ## Tecnologias Utilizadas
 
 - Python
@@ -103,7 +146,7 @@ streamlit run app.py
 
 ## Conclusão
 
-O **Data App** cumpre os objetivos propostos no Checkpoint 4, aplicando na prática conceitos de manipulação de dados e arquivos com Python. A ferramenta oferece conversão entre múltiplos formatos, interface amigável e tratamento robusto de erros, entregando uma solução funcional e de fácil utilização.
+O **Data App** cumpre os objetivos propostos no Checkpoint 4, aplicando na prática conceitos de manipulação de dados e arquivos com Python. A ferramenta oferece conversão entre múltiplos formatos, entrada de dados via texto ou arquivo, interface visual personalizada e tratamento robusto de erros, entregando uma solução funcional e de fácil utilização.
 
 ---
 
@@ -114,5 +157,3 @@ O **Data App** cumpre os objetivos propostos no Checkpoint 4, aplicando na prát
 | **Kauã Coelho Pacheco** |
 | **Vitória Kereski da Rosa** |
 | **Anita Palhares** |
-
----
