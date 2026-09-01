@@ -1,0 +1,20 @@
+[
+    {
+        "id":1,
+        "nome":"Bruno",
+        "cargo":"Analista",
+        "salario":4500
+    },
+    {
+        "id":2,
+        "nome":"Silvio",
+        "cargo":"Desenvolvedor",
+        "salario":6200
+    },
+    {
+        "id":3,
+        "nome":"Carla",
+        "cargo":"Gerente",
+        "salario":9500
+    }
+]

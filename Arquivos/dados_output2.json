@@ -1,0 +1,22 @@
+{
+    "id":{
+        "0":1,
+        "1":2,
+        "2":3
+    },
+    "nome":{
+        "0":"Bruno",
+        "1":"Silvio",
+        "2":"Carla"
+    },
+    "cargo":{
+        "0":"Analista",
+        "1":"Desenvolvedor",
+        "2":"Gerente"
+    },
+    "salario":{
+        "0":4500,
+        "1":6200,
+        "2":9500
+    }
+}
