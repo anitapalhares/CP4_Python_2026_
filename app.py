@@ -2,6 +2,150 @@ import json
 import pandas as pd
 import streamlit as st
 
+ 
+st.set_page_config(page_title="Data App | DEV.AK", page_icon="🟣", layout="centered")
+ 
+# ---------- ESTILO DEV.AK ----------
+st.markdown(
+    """
+    <style>
+        :root {
+            --dev-purple: #9b8cff;
+            --dev-purple-dark: #6c5ce7;
+            --dev-black: #111111;
+        }
+ 
+        html, body, [data-testid="stAppViewContainer"] {
+            background: #ffffff;
+            color: var(--dev-black);
+        }
+ 
+        /* Bola roxa clara em degradê no canto superior esquerdo */
+        [data-testid="stAppViewContainer"]::before {
+            content: "";
+            position: fixed;
+            top: -180px;
+            left: -180px;
+            width: 480px;
+            height: 480px;
+            background: radial-gradient(circle at center, rgba(155,140,255,0.55) 0%, rgba(155,140,255,0.25) 45%, rgba(255,255,255,0) 75%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+ 
+        [data-testid="stHeader"] {
+            background: transparent;
+        }
+ 
+        .block-container {
+            position: relative;
+            z-index: 1;
+            padding-top: 3rem;
+        }
+ 
+        h1, h2, h3 {
+            color: var(--dev-black) !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.5px;
+        }
+ 
+        h1 {
+            font-size: 2.4rem !important;
+        }
+ 
+        h1 span.accent {
+            color: var(--dev-purple-dark);
+        }
+ 
+        p, label, .stMarkdown, .stCaption {
+            color: #333333;
+        }
+ 
+        /* Inputs */
+        .stTextArea textarea, .stTextInput input {
+            border: 1.5px solid #e4defc !important;
+            border-radius: 10px !important;
+            background-color: #fafaff !important;
+        }
+ 
+        .stTextArea textarea:focus, .stTextInput input:focus {
+            border-color: var(--dev-purple-dark) !important;
+            box-shadow: 0 0 0 2px rgba(100, 92, 231, 0.35) !important;
+        }
+ 
+        /* File uploader */
+        [data-testid="stFileUploaderDropzone"] {
+            border: 1.5px dashed var(--dev-purple) !important;
+            background-color: #faf9ff !important;
+            border-radius: 12px !important;
+        }
+        /* Botão "Browse files" do uploader */
+        [data-testid="stFileUploaderDropzone"] button {
+            background: linear-gradient(135deg, var(--dev-purple) 0%, var(--dev-purple-dark) 100%) !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 10px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 14px rgba(108, 92, 231, 0.25);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        [data-testid="stFileUploaderDropzone"] button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(108, 92, 231, 0.35);
+            color: #ffffff !important;
+        }
+ 
+        /* Botões */
+        .stButton > button, .stDownloadButton > button {
+            background: linear-gradient(135deg, var(--dev-purple) 0%, var(--dev-purple-dark) 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 0.5rem 1.2rem;
+            font-weight: 600;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 4px 14px rgba(108, 92, 231, 0.25);
+        }
+ 
+        .stButton > button:hover, .stDownloadButton > button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(100, 92, 231, 0.35);
+            color: #ffffff;
+        }
+ 
+        /* Selectbox */
+        [data-baseweb="select"] > div {
+            border-radius: 10px !important;
+            border-color: #e4defc !important;
+        }
+ 
+        /* Dataframe */
+        [data-testid="stDataFrame"] {
+            border: 1px solid #ece9ff;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+ 
+        /* Code block */
+        .stCodeBlock, pre {
+            border-radius: 10px !important;
+            border: 1px solid #ece9ff !important;
+        }
+ 
+        /* Divider sutil */
+        hr {
+            border-color: #ece9ff;
+        }
+ 
+        footer {visibility: hidden;}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+# ---------- FIM ESTILO ----------
+
 
 def texto_para_dataframe(texto):
     texto = texto.strip()
