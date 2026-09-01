@@ -2,89 +2,101 @@ import json
 import pandas as pd
 import streamlit as st
 
-def read_uploaded_file(uploaded_file) -> pd.DataFrame:
-    file_name = uploaded_file.name.lower()
 
-    if file_name.endswith(".csv"):
-        return pd.read_csv(uploaded_file)
+def texto_para_dataframe(texto):
+    texto = texto.strip()
 
-    if file_name.endswith(".txt"):
-        return pd.read_txt(uploaded_file)
+    if "=" in texto and not texto.startswith(("{", "[")):
+        texto = texto.split("=", 1)[1].strip()
 
-    if file_name.endswith(".json"):
-        try:
-            return pd.read_json(uploaded_file)
-        except ValueError:
-            uploaded_file.seek(0)
-            data = json.load(uploaded_file)
-            return pd.DataFrame(data)
+    dados = eval(texto, {"__builtins__": {}}, {})
 
-    raise ValueError("Envie um arquivo CSV, JSON ou TXT.")
+    if isinstance(dados, dict) and "data" in dados:
+        dados = dados["data"]
 
+    if isinstance(dados, dict):
+        return pd.DataFrame(dados)
 
-def convert_dataframe(df: pd.DataFrame, output_format: str, json_orient: str) -> tuple[str, str, str]:
-    if output_format == "CSV":
-        data = df.to_csv(index=False, encoding="utf-8")
-        return data, "dados_convertidos.csv", "text/csv"
+    if isinstance(dados, list):
+        return pd.DataFrame(dados)
 
-    if output_format == "TXT":
-        data = df.to_csv(index=False, sep="\t")
-        return data, "dados_convertidos.txt", "text/plain"
-
-    data = df.to_json(orient=json_orient, indent=4, force_ascii=False)
-    return data, "dados_convertidos.json", "application/json"
+    raise ValueError("Digite um dict ou array/lista Python válido.")
 
 
-st.title("Data App - Conversor de Dados")
-st.subheader("CSV ↔ JSON com Pandas e Streamlit")
+st.title("Data App")
+st.subheader("DEV.AK")
 
-st.write(
-    "Envie um arquivo CSV, JSON ou TXT para visualizar os dados em tabela e baixar uma versão convertida."
-)
-
-st.write("Kauã, Anita e Vitória.")
-
-uploaded_file = st.file_uploader("Arquivo CSV, JSON ou TXT", type=["csv", "json", "txt"])
+if "df" not in st.session_state:
+    st.session_state["df"] = None
 
 try:
-    if uploaded_file is not None:
-        df = read_uploaded_file(uploaded_file)
-        st.caption(f"Arquivo carregado: {uploaded_file.name}")
-    else:
-        st.info("Envie um arquivo para começar.")
-        st.stop()
-
-    st.divider()
-
-    col_metric_1, col_metric_2 = st.columns(2)
-    col_metric_1.metric("Linhas", df.shape[0])
-    col_metric_2.metric("Colunas", df.shape[1])
-
-    st.dataframe(df, width="stretch")
-
-    st.divider()
-    st.subheader("Converter e baixar")
-
-    col_format, col_orient = st.columns(2)
-    output_format = col_format.selectbox("Formato de saída", ["CSV", "JSON"])
-    json_orient = col_orient.selectbox(
-        "Orientação do JSON",
-        ["records", "columns", "table"],
-        disabled=output_format != "JSON",
+    texto = st.text_area(
+        "Digite um dict ou array/lista Python",
+        "dicionario = {'nome': ['Ana', 'Bruno'], 'idade': [20, 25]}",
+    )
+    arquivo = st.file_uploader(
+        "Ou envie um arquivo CSV, JSON, XLSX ou PY",
+        type=["csv", "json", "xlsx", "py"],
     )
 
-    converted_data, file_name, mime_type = convert_dataframe(df, output_format, json_orient)
+    col_texto, col_arquivo = st.columns(2)
 
-    st.download_button(
-        "Baixar arquivo convertido",
-        data=converted_data.encode("utf-8"),
-        file_name=file_name,
-        mime=mime_type,
-    )
+    if col_texto.button("Carregar texto"):
+        if texto.strip():
+            st.session_state["df"] = texto_para_dataframe(texto)
+        else:
+            st.error("Digite um dict/lista Python.")
 
-    with st.expander("Prévia do arquivo convertido"):
-        st.code(converted_data, language="json" if output_format == "JSON" else "csv")
+    if col_arquivo.button("Carregar arquivo"):
+        if not arquivo:
+            st.error("Envie um arquivo.")
+        else:
+            nome = arquivo.name.lower()
 
+            if nome.endswith(".csv"):
+                st.session_state["df"] = pd.read_csv(arquivo)
+            elif nome.endswith(".xlsx"):
+                st.session_state["df"] = pd.read_excel(arquivo)
+            elif nome.endswith(".py"):
+                texto_py = arquivo.getvalue().decode("utf-8")
+                st.session_state["df"] = texto_para_dataframe(texto_py)
+            else:
+                dados = json.load(arquivo)
+                if isinstance(dados, dict) and "data" in dados:
+                    dados = dados["data"]
+                st.session_state["df"] = pd.DataFrame(dados)
 
-except Exception as error:
-    st.error(f"Não foi possível converter o arquivo: {error}")
+    df = st.session_state["df"]
+
+    if df is not None:
+        st.subheader("Dados carregados")
+        st.dataframe(df)
+
+        formato = st.selectbox("Converter para", ["JSON", "CSV", "XLSX"])
+
+        if formato == "JSON":
+            conteudo = df.to_json(orient="records", indent=4, force_ascii=False)
+            arquivo_saida = "dados.json"
+            tipo = "application/json"
+            download = conteudo.encode("utf-8")
+            st.code(conteudo)
+
+        elif formato == "CSV":
+            conteudo = df.to_csv(index=False)
+            arquivo_saida = "dados.csv"
+            tipo = "text/csv"
+            download = conteudo.encode("utf-8")
+            st.code(conteudo)
+
+        else:
+            conteudo = pd.io.common.BytesIO()
+            df.to_excel(conteudo, index=False)
+            arquivo_saida = "dados.xlsx"
+            tipo = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            download = conteudo.getvalue()
+
+        st.download_button("Baixar arquivo", data=download, file_name=arquivo_saida, mime=tipo)
+
+except Exception as erro:
+    st.error(f"Erro: {erro}")
+    st.error(f"Tipo: {type(erro).__name__}")
