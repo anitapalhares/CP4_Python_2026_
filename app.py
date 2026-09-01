@@ -15,6 +15,8 @@ def texto_para_dataframe(texto):
         dados = dados["data"]
 
     if isinstance(dados, dict):
+        if all(not isinstance(valor, list) for valor in dados.values()):
+            return pd.DataFrame([dados])
         return pd.DataFrame(dados)
 
     if isinstance(dados, list):
@@ -25,32 +27,25 @@ def texto_para_dataframe(texto):
 
 st.title("Data App")
 st.subheader("DEV.AK")
+st.write("Converta texto Python ou arquivos para JSON, CSV e XLSX.")
 
 if "df" not in st.session_state:
     st.session_state["df"] = None
 
 try:
     texto = st.text_area(
-        "Digite um dict ou array/lista Python",
-        "dicionario = {'nome': ['Ana', 'Bruno'], 'idade': [20, 25]}",
+        "Digite um dict ou array Python",
+        height=140,
+        placeholder="dicionario = {'nome': 'ana', 'chave': 'valor'}",
     )
+
     arquivo = st.file_uploader(
         "Ou envie um arquivo CSV, JSON, XLSX ou PY",
         type=["csv", "json", "xlsx", "py"],
     )
 
-    col_texto, col_arquivo = st.columns(2)
-
-    if col_texto.button("Carregar texto"):
-        if texto.strip():
-            st.session_state["df"] = texto_para_dataframe(texto)
-        else:
-            st.error("Digite um dict/lista Python.")
-
-    if col_arquivo.button("Carregar arquivo"):
-        if not arquivo:
-            st.error("Envie um arquivo.")
-        else:
+    if st.button("Enviar"):
+        if arquivo:
             nome = arquivo.name.lower()
 
             if nome.endswith(".csv"):
@@ -65,13 +60,19 @@ try:
                 if isinstance(dados, dict) and "data" in dados:
                     dados = dados["data"]
                 st.session_state["df"] = pd.DataFrame(dados)
+        elif texto.strip():
+            st.session_state["df"] = texto_para_dataframe(texto)
+        else:
+            st.error("Digite um texto ou envie um arquivo.")
 
     df = st.session_state["df"]
 
     if df is not None:
-        st.subheader("Dados carregados")
+        st.divider()
+        st.subheader("Prévia dos dados")
         st.dataframe(df)
 
+        st.subheader("Download")
         formato = st.selectbox("Converter para", ["JSON", "CSV", "XLSX"])
 
         if formato == "JSON":
@@ -95,7 +96,7 @@ try:
             tipo = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             download = conteudo.getvalue()
 
-        st.download_button("Baixar arquivo", data=download, file_name=arquivo_saida, mime=tipo)
+        st.download_button("Baixar", data=download, file_name=arquivo_saida, mime=tipo)
 
 except Exception as erro:
     st.error(f"Erro: {erro}")
